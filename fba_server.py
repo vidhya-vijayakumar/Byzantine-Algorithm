@@ -54,6 +54,7 @@ class MulticastPingPong(DatagramProtocol):
             #fileObject.close()
             self.broadcast_all(datagram,address)
             self.message_len = self.message_len + 1
+            self.vote()
             
         self.broadcast = 1
         
@@ -89,7 +90,7 @@ class MulticastPingPong(DatagramProtocol):
        
         
            
-    def vote(self,datagram):
+    def states(self,datagram):
         for i in range(len(send_port)):
             if self.vote_count > 2:
                 datagram1 = datagram + b"vote"
@@ -106,7 +107,31 @@ class MulticastPingPong(DatagramProtocol):
 
             
 
+    def vote(self):
+        if len(vote_count) > 2:
+            for i in range(len(send_port)):
+                self.transport.write(b"vote", ("228.0.0.5", send_port[i]))
+            if send_port[i] == 3010:
+                self.vote_count = self.vote_count+1
+                print(self.vote_count)
+            if self.vote_count == 2:
+                self.transport.write(datagram + b"vote", ("228.0.0.5", send_port[2]))
+                self.transport.write(datagram + b"vote", ("228.0.0.5", send_port[1]))
             
+            if send_port[i] == 3011:
+                self.vote_count = self.vote_count+1
+                print(self.vote_count)
+            if self.vote_count == 2:
+                self.transport.write(datagram + b"vote", ("228.0.0.5", send_port[0]))
+                self.transport.write(datagram + b"vote", ("228.0.0.5", send_port[1]))
+            
+            if send_port[i] == 3012:
+                self.vote_count = self.vote_count+1
+                print(self.vote_count)
+            if self.vote_count == 2:
+                self.transport.write(datagram + b"vote", ("228.0.0.5", send_port[0]))
+                self.transport.write(datagram + b"vote", ("228.0.0.5", send_port[2]))
+
 
     
                 
